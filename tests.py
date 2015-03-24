@@ -1,16 +1,16 @@
-#!/usr/bin/env python2.6
-#
-#  tests.py
-#  wrapper
-#
-#  Created by max klymyshyn on 11/15/09.
-#  Copyright (c) 2009 Sonettic. All rights reserved.
-#
+#!/usr/bin/env python
+"""
+ tests.py
+ wrapper
+
+ Created by max klymyshyn on 11/15/09.
+ Copyright (c) 2009 Sonettic. All rights reserved.
+"""
 
 from APNSWrapper import (APNSNotification, APNSAlert, APNSNotificationWrapper,
                          APNSFeedbackWrapper)
-import sys
 import base64
+import argparse
 
 
 def badge(wrapper, token):
@@ -35,15 +35,15 @@ def alert(wrapper, token):
     message = APNSNotification()
     message.tokenBase64(token)
 
-    alert = APNSAlert()
-    alert.body("Very important alert message")
+    apns_alert = APNSAlert()
+    apns_alert.body("Very important alert message")
 
-    alert.loc_key("ALERTMSG")
+    apns_alert.loc_key("ALERTMSG")
 
-    alert.loc_args(["arg1", "arg2"])
-    alert.action_loc_key("OPEN")
+    apns_alert.loc_args(["arg1", "arg2"])
+    apns_alert.action_loc_key("OPEN")
 
-    message.alert(alert)
+    message.alert(apns_alert)
 
     # properties wrapper
     message.setProperty("acme", (1, "custom string argument"))
@@ -52,9 +52,7 @@ def alert(wrapper, token):
     wrapper.append(message)
 
 
-def testAPNSWrapper(encoded_token, cert_path='iphone_cert.pem', sandbox=True):
-    cert_path = 'iphone_cert.pem'
-
+def testAPNSWrapper(encoded_token, cert_path, sandbox=True):
     """
     Method to testing apns-wrapper module.
     """
@@ -79,5 +77,14 @@ def testAPNSWrapper(encoded_token, cert_path='iphone_cert.pem', sandbox=True):
     print "\n".join(["> " + base64.standard_b64encode(y) for x, y in feedback])
 
 
+def main():
+    parser = argparse.ArgumentParser(description="Run the APNSWrapper Tests.")
+    parser.add_argument("apns_token", help="APNS Token to send to.")
+    parser.add_argument("-c", "--cert", default='iphone_cert.pem',
+                        help="APNS Certificate to use.")
+
+    arguments = parser.parse_args()
+    testAPNSWrapper(arguments.apns_token, arguments.cert, False)
+
 if __name__ == "__main__":
-    testAPNSWrapper(sys.argv[1])
+    main()
