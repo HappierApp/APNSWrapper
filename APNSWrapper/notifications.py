@@ -203,7 +203,7 @@ class APNSNotification(object):
 
     deviceToken = None
 
-    maxPayloadLength = 256
+    maxPayloadLength = 2000
     deviceTokenLength = 32
 
     properties = None
@@ -333,9 +333,11 @@ class APNSNotification(object):
                                            "in your notification.")
 
         payload = str(self)
-        if len(payload) > self.maxPayloadLength:
+        payload_len = len(payload)
+        if payload_len > self.maxPayloadLength:
             raise APNSPayloadLengthError("Length of Payload more than "
-                                         "%d bytes." % self.maxPayloadLength)
+                                         "%d bytes. payload: %s" % (
+                                            self.maxPayloadLength, payload_len))
 
         apnsPackFormat = "!BH{0}sH{1}s".format(len(self.deviceToken),
                                                len(payload))
